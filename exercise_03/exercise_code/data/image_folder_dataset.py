@@ -72,18 +72,7 @@ class ImageFolderDataset(Dataset):
         return images, labels
 
     def __len__(self):
-        length = None
-        ########################################################################
-        # TODO:                                                                #
-        # Return the length of the dataset (number of images)                  #
-        ########################################################################
-
-        pass
-
-        ########################################################################
-        #                           END OF YOUR CODE                           #
-        ########################################################################
-        return length
+        return len(self.images)
 
     @staticmethod
     def load_image_as_numpy(image_path):
@@ -91,7 +80,33 @@ class ImageFolderDataset(Dataset):
         return np.asarray(Image.open(image_path), dtype=float)
 
     def __getitem__(self, index):
-        data_dict = None
+  
+        #class_len = [4965, 5010,  4943, 5056, 5017, 5009, 4974, 4986, 5047, 4993 ]
+        #classes, class2idx = self._find_classes(self.root_path) # map classes to label
+        label = self.labels[index] # get label
+        #cls = list(class2idx.keys())[list(class2idx.values()).index(label)] # get class name to load
+
+        #to_substract = 0
+        #for i in range(label):
+            #to_substract += class_len[i]
+        #file_idx = index - to_substract + 1
+
+        #img_path = os.path.join(self.root_path, cls, str(file_idx).zfill(4) + ".png")
+ 
+        img = self.images[index]
+        #print(img)
+        img = self.load_image_as_numpy(self.images[index])
+      
+        if self.transform:
+            img = self.transform(img)
+        data_dict = {'image': img, 'label': label}
+
+        return data_dict
+
+
+
+
+
         ########################################################################
         # TODO:                                                                #
         # create a dict of the data at the given index in your dataset         #
@@ -116,13 +131,9 @@ class ImageFolderDataset(Dataset):
         #   not strings.                                                       #    
         ########################################################################
 
-        pass
-
         ########################################################################
         #                           END OF YOUR CODE                           #
         ########################################################################
-        return data_dict
-
 
 class MemoryImageFolderDataset(ImageFolderDataset):
     def __init__(self, root, *args,

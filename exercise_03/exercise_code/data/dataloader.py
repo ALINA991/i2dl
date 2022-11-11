@@ -24,44 +24,54 @@ class DataLoader:
         self.drop_last = drop_last
 
     def __iter__(self):
-        ########################################################################
-        # TODO:                                                                #
-        # Define an iterable function that samples batches from the dataset.   #
-        # Each batch should be a dict containing numpy arrays of length        #
-        # batch_size (except for the last batch if drop_last=True)             #
-        # Hints:                                                               #
-        #   - np.random.permutation(n) can be used to get a list of all        #
-        #     numbers from 0 to n-1 in a random order                          #
-        #   - To load data efficiently, you should try to load only those      #
-        #     samples from the dataset that are needed for the current batch.  #
-        #     An easy way to do this is to build a generator with the yield    #
-        #     keyword, see https://wiki.python.org/moin/Generators             #
-        #   - Have a look at the "DataLoader" notebook first. This function is #
-        #     supposed to combine the functions:                               #
-        #       - combine_batch_dicts                                          #
-        #       - batch_to_numpy                                               #
-        #       - build_batch_iterator                                         #
-        #     in section 1 of the notebook.                                    #
-        ########################################################################
 
-        pass
+        if self.shuffle:
+            index_iterator = iter(np.random.permutation(len(self.dataset)))  # define indices as iterator
+        else:
+            index_iterator = iter(range(len(self.dataset)))  # define indices as iterator
 
-        ########################################################################
-        #                           END OF YOUR CODE                           #
-        ########################################################################
+        batch = []
+        for index in index_iterator:  # iterate over indices using the iterator
+            batch.append(self.dataset[index])
+            if len(batch) == self.batch_size:
+                yield batch_to_numpy(combine_batch_dicts(batch))  # use yield keyword to define a iterable generator
+                batch = []
+        if not self.drop_last:
+            yield batch_to_numpy(combine_batch_dicts(batch))
 
     def __len__(self):
-        length = None
-        ########################################################################
-        # TODO:                                                                #
-        # Return the length of the dataloader                                  #
-        # Hint: this is the number of batches you can sample from the dataset. #
-        # Don't forget to check for drop last!                                 #
-        ########################################################################
 
-        pass
 
-        ########################################################################
-        #                           END OF YOUR CODE                           #
-        ########################################################################
+        length = len(self.dataset) // self.batch_size
+        if not self.drop_last:
+            length += 1
+
         return length
+
+
+def build_batches(dataset, batch_size):
+    batches = []  # list of all mini-batches
+    batch = []  # current mini-batch
+    for i in range(len(dataset)):
+        batch.append(dataset[i])
+        if len(batch) == batch_size:  # if the current mini-batch is full,
+            batches.append(batch)  # add it to the list of mini-batches,
+            batch = []  # and start a new mini-batch
+    return batches
+
+
+def combine_batch_dicts(batch):
+    batch_dict = {}
+    for data_dict in batch:
+        for key, value in data_dict.items():
+            if key not in batch_dict:
+                batch_dict[key] = []
+            batch_dict[key].append(value)
+    return batch_dict
+
+def batch_to_numpy(batch):
+    numpy_batch = {}
+    for key, value in batch.items():
+        numpy_batch[key] = np.array(value)
+        return numpy_batch
+

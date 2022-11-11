@@ -17,22 +17,12 @@ class RescaleTransform:
         """
         self.min = out_range[0]
         self.max = out_range[1]
-        self._data_min = in_range[0]
-        self._data_max = in_range[1]
+        self.data_min = in_range[0]
+        self.data_max = in_range[1]
 
     def __call__(self, images):
-        ########################################################################
-        # TODO:                                                                #
-        # Rescale the given images:                                            #
-        #   - from (self._data_min, self._data_max)                            #
-        #   - to (self.min, self.max)                                          #
-        ########################################################################
 
-        pass
-
-        ########################################################################
-        #                           END OF YOUR CODE                           #
-        ########################################################################
+        images = (images - self.data_min) * (self.max - self.min) / (self.data_max - self.data_min) + self.data_min
         return images
     
 
@@ -42,8 +32,17 @@ def compute_image_mean_and_std(images):
     :param images: numpy array of shape NxHxWxC
         (for N images with C channels of spatial size HxW)
     :returns: per-channels mean and std; numpy array of shape (C,). 
+
+        mean = np.array([np.mean(images[:,:,:,i]) for i in range(3)])
+
+    std = np.empty_like(mean)
+    for i in range(3):
+        std[i] = np.std(images[:,:,:,i])
     """
-    mean, std = None, None
+
+    mean = np.mean(images, axis = (0,1,2))
+    std = np.std(images, axis = (0,1,2))
+
     ########################################################################
     # TODO:                                                                #
     # Calculate the per-channel mean and standard deviation of the images  #
@@ -55,7 +54,7 @@ def compute_image_mean_and_std(images):
     # test yourself.                                                       #
     ########################################################################
 
-    pass
+
 
     ########################################################################
     #                           END OF YOUR CODE                           #
@@ -88,8 +87,8 @@ class NormalizeTransform:
         #   - substract the mean of dataset                                    #
         #   - divide by standard deviation                                     #
         ########################################################################
-
-        pass
+        mean, std = compute_image_mean_and_std(images= images)
+        images = (images - mean) / std
 
         ########################################################################
         #                           END OF YOUR CODE                           #
