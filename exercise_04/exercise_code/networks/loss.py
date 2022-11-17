@@ -5,6 +5,7 @@ import numpy as np
 from exercise_code.networks.linear_model import *
 
 
+
 class Loss(object):
     def __init__(self):
         self.grad_history = []
@@ -95,22 +96,12 @@ class BCE(Loss):
         :param y_out: [N, ] array predicted value of your model.
                 y_truth: [N, ] array ground truth value of your training set.
         :return: [N, ] array of binary cross entropy loss for each sample of your training set.
+
         """
-        result = None
+        # see if need to divide by n
+        loss = -( y_truth * np.log(y_out) +(1- y_truth) * np.log(1 - y_out))
 
-        ########################################################################
-        # TODO:                                                                #
-        # Implement the forward pass and return the output of the BCE loss.    #
-        ########################################################################
-
-
-        pass
-
-        ########################################################################
-        #                           END OF YOUR CODE                           #
-        ########################################################################
-
-        return result
+        return  loss
 
     def backward(self, y_out, y_truth):
         """
@@ -120,18 +111,23 @@ class BCE(Loss):
                y_truth: [N, ] array ground truth value of your training set.
         :return: [N, ] array of binary cross entropy loss gradients w.r.t y_out for
                   each sample of your training set.
+                  dL/dy
         """
-        gradient = None
-
+        '''
+        gradient = []
+        for yo, yt in enumerate( zip(y_out, y_truth) ):
+            print(type(yo), type(yt))
+            print( len(yt))
+            gradient.append((yt / yo) * (1 - yt) / (1 - yo))
+        '''
         ########################################################################
         # TODO:                                                                #
         # Implement the backward pass. Return the gradient w.r.t to the input  #
         # to the loss function, y_out.                                         #
         ########################################################################
-
-
-        pass
-
+        #ones = np.ones_like(y_truth)
+        gradient = (y_out - y_truth) / (y_out * ( 1 - y_out))
+     
         ########################################################################
         #                           END OF YOUR CODE                           #
         ########################################################################

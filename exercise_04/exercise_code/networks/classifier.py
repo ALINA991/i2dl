@@ -44,7 +44,8 @@ class Classifier(Network):
         X = np.concatenate((X, np.ones((batch_size, 1))), axis=1)
         
         # output variable
-        y = None
+        s = np.dot(X, self.W)
+        y_out = self.sigmoid(s)
 
         ########################################################################
         # TODO:                                                                #
@@ -54,14 +55,14 @@ class Classifier(Network):
         # you will need to use in the backward() function. E.g.: (X, ...)      #
         ########################################################################
 
+        self.cache = (X, s, y_out, self.W)
 
-        pass
 
         ########################################################################
         #                           END OF YOUR CODE                           #
         ########################################################################
 
-        return y
+        return y_out
 
     def backward(self, dout):
         """
@@ -72,7 +73,29 @@ class Classifier(Network):
         """
         assert self.cache is not None, "Run a forward pass before the backward pass. Also, don't forget to store the relevat variables\
             such as in 'self.cache = (X, y, ...)"
-        dW = None
+
+        dSdW = self.cache[0] # = X
+        y_out = self.cache[2]
+    
+        #drds = self.sigmoid_dev(np.dot( dSdW, self.W))
+  
+
+
+        #print(self.sigmoid_dev(s).shape)
+
+        #print(np.dot(dout, self.sigmoid_dev(s).T).shape)
+  
+        #dydW = np.dot(drds.T,  dSdW)
+
+
+    
+        dW = np.dot(dSdW.T, y_out * (1 - y_out) * dout)
+
+        #dW =  np.dot(dout, dydW)
+
+
+
+
 
         ########################################################################
         # TODO:                                                                #
@@ -88,7 +111,7 @@ class Classifier(Network):
         ########################################################################
 
 
-        pass
+
 
         ########################################################################
         #                           END OF YOUR CODE                           #
@@ -96,28 +119,12 @@ class Classifier(Network):
         return dW
 
     def sigmoid(self, x):
-        """
-        Computes the ouput of the sigmoid function
 
-        :param x: input of the sigmoid, np.array of any shape
-        :return: output of the sigmoid with same shape as input vector x
-        """
-        out = None
+        return 1 / ( 1 + np.exp(-x))
 
-        ########################################################################
-        # TODO:                                                                #
-        # Implement the sigmoid function over the input x.                     #
-        # Return out.                                                          #
-        ########################################################################
+    def sigmoid_dev(self, x):
 
-
-        pass
-
-        ########################################################################
-        #                           END OF YOUR CODE                           #
-        ########################################################################
-
-        return out
+        return self.sigmoid(x) * (1 - self.sigmoid(x))
 
     def save_model(self):
         directory = 'models'

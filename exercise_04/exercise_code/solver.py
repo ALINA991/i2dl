@@ -90,6 +90,16 @@ class Solver(object):
         X_train = self.X_train
         y_train = self.y_train
         opt = self.opt
+
+        y_out = self.model.forward(X_train)
+        loss = self.loss_func.forward(y_out, y_train)
+        dLdy_out = (1/ len(X_train)) * self.loss_func.backward(y_out, y_train)
+        dL_dw = self.model.backward(dLdy_out)
+        self.opt.step(dL_dw)
+        
+
+
+
         ########################################################################
         #   TODO: 													           #
         #	Get the gradients dhat{y}/dW and dLoss/dhat{y}. 	               #
@@ -105,7 +115,7 @@ class Solver(object):
         ########################################################################
 
 
-        pass
+        
 
         ########################################################################
         #                           END OF YOUR CODE                           #
